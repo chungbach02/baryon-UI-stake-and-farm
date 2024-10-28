@@ -1,0 +1,104 @@
+@import '@ne/uikit-dex/icons/icons.css';
+@import '@ne/uikit-dex/styles/baryon-colors.css';
+@import '@ne/uikit-dex/styles/globals.css';
+
+@import '@coin98-com/wallet-adapter-react-ui/styles.css';
+
+@import './animation.scss';
+
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+
+  body {
+    font-family: 'Lexend';
+    @apply bg-background-surface text-base desktopLg:text-sm text-txt-primary font-light tracking-wide;
+  }
+
+  * {
+    -ms-overflow-style: none;
+    /* Firefox */
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+  button:focus-visible {
+    outline: none;
+  }
+
+  input[type='number'] {
+    -moz-appearance: textfield;
+  }
+
+  input[type='number']::-webkit-inner-spin-button,
+  input[type='number']::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  h1 {
+    @apply text-[56px] ipad:text-4xl phone:text-3xl leading-normal;
+  }
+
+  h2 {
+    @apply text-4xl ipad:text-3xl phone:text-2xl;
+  }
+
+  h3 {
+    @apply text-2xl ipad:text-xl phone:text-xl;
+  }
+
+  h4 {
+    @apply text-xl ipad:text-lg phone:text-lg;
+  }
+
+  h5 {
+    @apply text-lg ipad:text-base phone:text-sm;
+  }
+
+  h6 {
+    @apply text-base ipad:text-sm;
+  }
+}
+
+@layer utilities {
+  .container {
+    @apply max-w-[1384px] px-8 desktop:px-6 phone:px-4 m-auto;
+  }
+
+  .container-second {
+    @apply max-w-[1000px] px-8 desktop:px-6 phone:px-4 m-auto;
+  }
+}
+
+@layer components {
+  .vertical-divider {
+    @apply h-4 w-[1px] bg-txt-placeholder mx-1;
+  }
+  
+  .flex-center {
+    @apply flex items-center justify-center;
+  }
+
+  .flex-between {
+    @apply flex items-center justify-between;
+  }
+
+  .absolute-before {
+    @apply before:content-[''] before:absolute;
+  }
+
+  .absolute-after {
+    @apply after:content-[''] after:absolute;
+  }
+
+  .absolute-center {
+    @apply absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2;
+  }
+}

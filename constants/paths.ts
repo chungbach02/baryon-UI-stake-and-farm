@@ -1,0 +1,15 @@
+export const PATHS = {
+  HOME: '/',
+  SWAP: '/swap',
+  LIQUIDITY: '/liquidity',
+  LIQUIDITY_ADD: '/liquidity/add',
+  INFO: '/info',
+  FARM: '/farm',
+  STAKE: '/stake',
+  SNAPSHOT: '/snapshot',
+  POOLS: '/pools',
+  POOL: '/pool',
+  TOKENS: '/tokens',
+  TOKEN: '/token',
+  WALLET: '/wallet',
+};

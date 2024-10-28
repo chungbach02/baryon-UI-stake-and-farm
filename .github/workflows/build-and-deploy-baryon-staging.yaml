@@ -1,0 +1,64 @@
+name: Build and Deploy Baryon Staging
+
+on:
+  push:
+    branches:
+      - staging
+
+env:
+  AWS_REGION : "ap-southeast-1"                # DON'T CHANGE, PLEASE
+  AWS_ACCOUNT_ID : "751062111139"              # DON'T CHANGE, PLEASE
+  AWS_ROLE_ASSUME_NAME : "baryon-ci-stg"        # ASK DevOps team, please
+  AWS_ECR_REPO_NAME : "baryon-web"              # ASK DevOps team, please
+  CODEBUILD_PROJECT_NAME : "baryon-stg"         # ASK DevOps team, please
+  CULIOPS_BRANCH : "main"                      # ASK DevOps team, please
+  ECS_CLUSTER_NAME : "ecs-shared-stg"          # ASK DevOps team, please
+  ECS_SERVICE_NAME : "web"                     # ASK DevOps team, please
+  DIR_TO_BUILD: "."                            # CHANGE to "." on your repo
+  DOCKER_FILE_NAME: "docker/staging/Dockerfile"              # CHANGE to docker file name on your repo
+
+permissions:
+      id-token: write
+      contents: write
+      actions: write
+
+jobs:
+  set_vars:
+    runs-on: [ self-hosted, Linux ]
+    outputs:
+      aws_region: ${{ env.AWS_REGION }}
+      aws_account_id: ${{ env.AWS_ACCOUNT_ID }}
+      aws_role_assume_name: ${{ env.AWS_ROLE_ASSUME_NAME }}
+      aws_ecr_repo_name: ${{ env.AWS_ECR_REPO_NAME }}
+      codebuild_project_name: ${{ env.CODEBUILD_PROJECT_NAME }}
+      culiops_branch: ${{ env.CULIOPS_BRANCH }}
+      ecs_cluster_name: ${{ env.ECS_CLUSTER_NAME }}
+      ecs_service_name: ${{ env.ECS_SERVICE_NAME }}
+      dir_to_build: ${{ env.DIR_TO_BUILD }}
+      docker_file_name: ${{ env.DOCKER_FILE_NAME }}
+    steps:
+      - run: echo "Exposing ENV vars"
+  
+  build:
+    needs: set_vars
+    uses: coin98/common-workflows/.github/workflows/build-docker-image.yml@main
+    with:
+      aws_region: ${{ needs.set_vars.outputs.aws_region }}
+      aws_account_id: ${{ needs.set_vars.outputs.aws_account_id }}
+      aws_role_assume_name: ${{ needs.set_vars.outputs.aws_role_assume_name }}
+      aws_ecr_repo_name: ${{ needs.set_vars.outputs.aws_ecr_repo_name }}
+      dir_to_build: ${{ needs.set_vars.outputs.dir_to_build }}
+      docker_file_name: ${{ needs.set_vars.outputs.docker_file_name }}
+  
+  deploy:
+    needs: [set_vars, build]
+    uses: coin98/common-workflows/.github/workflows/deploy-by-codebuild.yml@main
+    with:
+      aws_region: ${{ needs.set_vars.outputs.aws_region }}
+      aws_account_id: ${{ needs.set_vars.outputs.aws_account_id }}
+      aws_role_assume_name: ${{ needs.set_vars.outputs.aws_role_assume_name }}
+      codebuild_project_name: ${{ needs.set_vars.outputs.codebuild_project_name }}
+      culiops_branch: ${{ needs.set_vars.outputs.culiops_branch }}
+      ecs_cluster_name: ${{ needs.set_vars.outputs.ecs_cluster_name }}
+      ecs_service_name: ${{ needs.set_vars.outputs.ecs_service_name }}
+      image_tag: ${{ needs.build.outputs.image_tag }}
