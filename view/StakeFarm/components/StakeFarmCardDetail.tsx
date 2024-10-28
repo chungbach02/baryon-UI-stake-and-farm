@@ -36,7 +36,7 @@ export default function StakeFarmCardDetail({ data }: any) {
           <div className="w-6 group-hover:scale-110">
             <Icon iconName="pool_info" />
           </div>
-          <span className="text-txt-yellow group-hover:text-brand-primary ">
+          <span className="text-brand-primary group-hover:text-brand-primary ">
             See token info
           </span>
         </Link>

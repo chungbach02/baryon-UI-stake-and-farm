@@ -20,7 +20,7 @@ export default function StakeFarmHead({ isFarm }: StakeFarmHead) {
             <div className="text-4xl font-medium mb-4">
               {isFarm ? 'Farm' : 'Stake'}
             </div>
-            <div className="text-base font-light text-gray-400">
+            <div className="text-base font-light text-txt-secondary">
               {isFarm
                 ? t('Farm LP tokens to earn rewards')
                 : t('Stake tokens to earn rewards')}
@@ -28,7 +28,7 @@ export default function StakeFarmHead({ isFarm }: StakeFarmHead) {
           </div>
           <div className="info-total-value__bottom">
             <div className="mb-3">Total Value Staked</div>
-            <div className="text-2xl text-yellow-500 font-semibold">
+            <div className="text-2xl text-brand-primary font-semibold">
               {isFarm ? (
                 <CurrencyValue value={0} />
               ) : (
@@ -60,7 +60,7 @@ export default function StakeFarmHead({ isFarm }: StakeFarmHead) {
       </BoxSecondary>
       <BoxSecondary className="my-reward-farm-v2 col-span-3 p-5 flex flex-col justify-center text-center relative">
         <div className="text-base font-light mb-4">My Rewards</div>
-        <div className="text-3xl text-yellow-500 font-semibold">
+        <div className="text-3xl text-brand-primary font-semibold">
           {isFarm ? (
             <CurrencyValue value={0} />
           ) : (

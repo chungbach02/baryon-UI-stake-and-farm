@@ -12,7 +12,9 @@ const fontSize = 16;
 export default function SelectedSort({ name, isSelected, isUp }: SelectSort) {
   return (
     <div className="flex text-base gap-1 ">
-      <button className={isSelected ? 'text-white' : 'text-gray-400'}>
+      <button
+        className={isSelected ? 'text-txt-primary' : 'text-txt-secondary'}
+      >
         {name}
       </button>
       <div className="flex justify-center items-center">
