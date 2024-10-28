@@ -14,7 +14,7 @@ export default function StakeFarmHead({ isFarm }: StakeFarmHead) {
   const t = useTranslations();
   return (
     <div className=" grid grid-cols-11 gap-8  ">
-      <BoxSecondary className="flex justify-between p-5 col-span-8 relative ">
+      <BoxSecondary className="flex justify-between p-5 col-span-8 relative overflow-hidden ">
         <div className="info-left ">
           <div className="mb-12">
             <div className="text-4xl font-medium mb-4">

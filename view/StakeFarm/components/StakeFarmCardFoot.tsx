@@ -73,13 +73,13 @@ export default function StakeFarmCardFoot({ data }: any) {
                 <div className="flex">
                   <button
                     onClick={subClicked}
-                    className="px-5 w-12 py-2 bg-txt-secondary mr-2 rounded-lg"
+                    className="px-5 w-12 py-2 bg-btn-disable text-brand-primary text-xl mr-2 rounded-lg"
                   >
                     -
                   </button>
                   <button
                     onClick={addClicked}
-                    className="px-4 w-12 py-2 bg-txt-secondary rounded-lg"
+                    className="px-4 w-12 py-2 bg-btn-disable text-brand-primary text-xl rounded-lg"
                   >
                     +
                   </button>
