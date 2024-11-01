@@ -33,7 +33,7 @@ export default function StakeFarmCardBody({ data }: any) {
         </div>
       </div>
       <div className="flex justify-between">
-        <div className="text-txt-secondary">APR</div>
+        <div className="text-txt-secondary">End</div>
         <div className="text-brand-primary font-semibold text-base">
           {data.finish}
         </div>

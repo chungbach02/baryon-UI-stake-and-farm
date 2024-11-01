@@ -1,0 +1,156 @@
+{
+  "ancient8Mainnet": [
+    {
+      "cgkId": "usd-coin",
+      "symbol": "usdc",
+      "decimal": 6,
+      "name": "USDC",
+      "image": "https://file.coin98.com/images/bxuspxmvfpbs7ali-s34l9fupoy1sgvnz-3qzlkh6yydhmug10-xpmgadc1kg1hxcfx-O9fwrUzUvuTfzW4g.png",
+      "chain": "ancient8Mainnet",
+      "address": "0x97423A68BAe94b5De52d767a17aBCc54c157c0E5",
+      "isVaultCoin": false,
+      "isEarnCoin": false
+    },
+    {
+      "cgkId": "0",
+      "symbol": "EIGHTEEN",
+      "decimal": 18,
+      "name": "A8 decimal 18",
+      "image": "https://file.coin98.com/images/512_lightmoderound-gAT0ocQmRd7aKhgV.webp",
+      "chain": "ancient8Mainnet",
+      "address": "0x27c57D09ccD919c04C7024798EB95bfac1286AED",
+      "isVaultCoin": true,
+      "isEarnCoin": false
+    },
+    {
+      "cgkId": "0",
+      "symbol": "HAIRY",
+      "decimal": 18,
+      "name": "Hairy Cat",
+      "image": "https://file.coin98.com/images/hairy-ZezFyXEZ3eYvdx6k.jpeg",
+      "chain": "ancient8Mainnet",
+      "address": "0x38bb7b9b87bdfbed883aaf50a2f411d330fe32d6",
+      "isVaultCoin": true,
+      "isEarnCoin": false
+    }
+  ],
+  "bitkub": [
+    {
+      "cgkId": "bitkub-coin",
+      "symbol": "KUB",
+      "decimal": 18,
+      "name": "Bitkub",
+      "image": "https://coin98.s3.ap-southeast-1.amazonaws.com/Currency/bitkub.png",
+      "chain": "bitkub"
+    },
+    {
+      "cgkId": "bitkub-coin",
+      "symbol": "KKUB",
+      "decimal": 18,
+      "name": "Bitkub Coin",
+      "image": "https://coin98.s3.amazonaws.com/2SdmzSqXauWRUrBa",
+      "chain": "bitkub",
+      "address": "0x67ebd850304c70d983b2d1b93ea79c7cd6c3f6b5",
+      "isVaultCoin": false,
+      "isEarnCoin": false
+    },
+    {
+      "cgkId": "tether",
+      "symbol": "KUSDT",
+      "decimal": 18,
+      "name": "USDT Kub",
+      "image": "https://file.coin98.com/images/untitled-2-MOlfQsaHzeYcV9Gh.png",
+      "chain": "bitkub",
+      "address": "0x7d984c24d2499d840eb3b7016077164e15e5faa6",
+      "isVaultCoin": false,
+      "isEarnCoin": false
+    },
+    {
+      "cgkId": "0",
+      "symbol": "xrb",
+      "decimal": 18,
+      "name": "XRB Token",
+      "image": "https://coin98.s3.amazonaws.com/MkLzJepc045pEAm6",
+      "chain": "bitkub",
+      "address": "0xa57ce1c137b3403d16be22bbd917c37dc1aecd46",
+      "isVaultCoin": false,
+      "isEarnCoin": false
+    },
+    {
+      "cgkId": "0",
+      "symbol": "fans",
+      "decimal": 18,
+      "name": "FANS",
+      "image": "https://coin98.s3.amazonaws.com/mVdTFUUkAyQcyuOa",
+      "chain": "bitkub",
+      "address": "0x9c04efd1e9ad51a605eedcb576159242ff930368",
+      "isVaultCoin": false,
+      "isEarnCoin": false
+    }
+  ],
+  "binanceSmart": [
+    {
+      "cgkId": "",
+      "symbol": "BNB-CUSD",
+      "decimal": 18,
+      "name": "Baryon BNB-CUSD Baryon LP",
+      "image": "https://coin98.s3.ap-southeast-1.amazonaws.com/Coin/baryonLogo.jpg",
+      "chain": "binanceSmart",
+      "address": "0xf2e8ed0fe16b7c47843461c1ecfe92ef55aa8149"
+    },
+    {
+      "cgkId": "",
+      "symbol": "KRS-OGS",
+      "decimal": 18,
+      "name": "Baryon KRS-OGS Baryon LP",
+      "image": "https://coin98.s3.ap-southeast-1.amazonaws.com/Coin/baryonLogo.jpg",
+      "chain": "binanceSmart",
+      "address": "0x5c75e2412ccabb21c3263364a875b8dc139f17a1"
+    }
+  ],
+  "tomo": [
+    {
+      "cgkId": "gunstar-metaverse",
+      "symbol": "gsts",
+      "decimal": 18,
+      "name": "Gunstar Metaverse",
+      "image": "https://file.coin98.com/images/fwedf3mlvciqe91v-bhkvjFqBwQkwjsMm.png",
+      "chain": "tomo",
+      "address": "0xC8E2B1e17D6C08d872Bfaf5a1C46385A086BdA5b",
+      "isVaultCoin": false,
+      "isEarnCoin": false
+    },
+    {
+      "cgkId": "counterfire-economic-coin",
+      "symbol": "cec",
+      "decimal": 18,
+      "name": "Counterfire Economic Coin",
+      "image": "https://file.coin98.com/images/untitled-1-NNZH9pCMZhWYwEvY.png",
+      "chain": "tomo",
+      "address": "0x111111267109489dc6f350608d5113B10c0C5cd7",
+      "isVaultCoin": true,
+      "isEarnCoin": false
+    }
+  ]
+}
+
+{
+  "hash": "0xb5f0cfcbb61147003a3b85eb05633706adbf7bd330dc75bd149f15e0c8c549f0",
+  "chain": "tomo",
+  "rewardTokens": [
+      "0x9031d4Dd4ca4237264F527FF6Ae0097991ba7ad1","0x111111267109489dc6f350608d5113B10c0C5cd7"
+  ],
+  "rewardMultipliers": [
+      "1"
+  ],
+  "rewardsStartTime": "1729156800",
+  "rewardPerSeconds": "1",
+  "rewardsExpiration": "1730539046",
+  "stakedLpAddress": "0x9031d4Dd4ca4237264F527FF6Ae0097991ba7ad1",
+  "pid": "42",
+  "rewarder": "0x83bb2406EE9A6108c473676314053ac243150503",
+  "isV2": true,
+  "createdAt": "2024-10-17T09:17:33.454Z",
+  "updatedAt": "2024-10-25T08:10:34.636Z",
+  "__v": 0
+}
