@@ -1,20 +1,39 @@
 'use client';
-import React from 'react';
+import React, { useContext } from 'react';
 import { VideoBox } from '@ne/uikit-dex';
 import { STAKEFARM, VIDEO } from '@/public';
 import CurrencyValue from '@/components/common/CurrencyValue';
 import Image from 'next/image';
 import BoxSecondary from '@/components/ui/BoxSecondary';
 import { useTranslations } from 'next-intl';
+import { dataHandled } from '@/view/StakeFarm';
 interface StakeFarmHead {
   isFarm?: boolean;
+  // data?: any;
 }
 
 export default function StakeFarmHead({ isFarm }: StakeFarmHead) {
   const t = useTranslations();
+  const data = useContext(dataHandled);
+
+  const listStaked = data
+    ? data.map((stake: any) => parseFloat(stake.liquidity))
+    : [0];
+  // console.log({ listStaked });
+  const totalStaked = listStaked.reduce(
+    (sum: number, currentValue: number) => sum + currentValue,
+    0,
+  );
+  const listReward = data
+    ? data.map((stake: any) => parseFloat(stake.pendingReward))
+    : [0];
+  const totalReward = listReward.reduce(
+    (sum: number, currentValue: number) => sum + currentValue,
+    0,
+  );
   return (
     <div className=" grid grid-cols-11 gap-8  ">
-      <BoxSecondary className="flex justify-between p-5 col-span-8 relative overflow-hidden ">
+      <BoxSecondary className="flex justify-between p-5 col-span-8 relative  ">
         <div className="info-left ">
           <div className="mb-12">
             <div className="text-4xl font-medium mb-4">
@@ -32,7 +51,7 @@ export default function StakeFarmHead({ isFarm }: StakeFarmHead) {
               {isFarm ? (
                 <CurrencyValue value={0} />
               ) : (
-                <CurrencyValue value={1115121.12} />
+                <CurrencyValue value={totalStaked} />
               )}
             </div>
           </div>
@@ -64,7 +83,7 @@ export default function StakeFarmHead({ isFarm }: StakeFarmHead) {
           {isFarm ? (
             <CurrencyValue value={0} />
           ) : (
-            <CurrencyValue value={1115121.12} />
+            <CurrencyValue value={totalReward} />
           )}
         </div>
         <Image

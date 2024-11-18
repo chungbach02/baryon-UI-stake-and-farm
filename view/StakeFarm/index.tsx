@@ -5,436 +5,59 @@ import StakeFarmHead from '@/view/StakeFarm/StakeFarmHead';
 import { useFilterParams } from '@/hook/useFilterParams';
 import { Input, Tooltip, PieLoading, Switch, TabButton } from '@ne/uikit-dex';
 import { useTranslations } from 'next-intl';
-import React, { useEffect, useState } from 'react';
+import React, { createContext, useEffect, useState } from 'react';
 import { twMerge } from 'tailwind-merge';
 import SelectedSort from '@/view/StakeFarm/components/SelectedSort';
 import StakeFarmContent from '@/view/StakeFarm/StakeFarmContent';
 import { useBaryonServices } from '@/providers/BaryonServicesProvider';
 import { ENDPOINTS } from '@/constants/endpoints';
 import { useGlobalStore } from '@/stores/global.store';
-import { find, values } from 'lodash';
+import { find, method, values } from 'lodash';
+import ABIBaryon from './components/abiFarmV2';
+import ABIVRC25 from '@/view/StakeFarm/components/ABIVRC25';
+import {
+  convertBalanceToWei,
+  convertWeiToBalance,
+  dataByPid,
+  getUserInfo,
+  getPendingReward,
+} from '@/view/StakeFarm/StakeFarm';
+// import { useWallet } from '@coin98-com/wallet-adapter-react';
 
 import Web3 from 'Web3';
+import useDataHandle from './hook/useDataHandle';
+import Image from 'next/image';
+import { IMAGE } from '@/public';
 
-const web3 = new Web3('https://rpc.viction.xyz');
-const ABIVRC25 = [
-  { inputs: [], stateMutability: 'nonpayable', type: 'constructor' },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: true,
-        internalType: 'address',
-        name: 'owner',
-        type: 'address',
-      },
-      {
-        indexed: true,
-        internalType: 'address',
-        name: 'spender',
-        type: 'address',
-      },
-      {
-        indexed: false,
-        internalType: 'uint256',
-        name: 'value',
-        type: 'uint256',
-      },
-    ],
-    name: 'Approval',
-    type: 'event',
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: true,
-        internalType: 'address',
-        name: 'from',
-        type: 'address',
-      },
-      { indexed: true, internalType: 'address', name: 'to', type: 'address' },
-      {
-        indexed: true,
-        internalType: 'address',
-        name: 'issuer',
-        type: 'address',
-      },
-      {
-        indexed: false,
-        internalType: 'uint256',
-        name: 'value',
-        type: 'uint256',
-      },
-    ],
-    name: 'Fee',
-    type: 'event',
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: false,
-        internalType: 'address',
-        name: 'account',
-        type: 'address',
-      },
-    ],
-    name: 'Frozen',
-    type: 'event',
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: true,
-        internalType: 'address',
-        name: 'previousOwner',
-        type: 'address',
-      },
-      {
-        indexed: true,
-        internalType: 'address',
-        name: 'newOwner',
-        type: 'address',
-      },
-    ],
-    name: 'OwnershipTransferred',
-    type: 'event',
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: true,
-        internalType: 'address',
-        name: 'from',
-        type: 'address',
-      },
-      { indexed: true, internalType: 'address', name: 'to', type: 'address' },
-      {
-        indexed: false,
-        internalType: 'uint256',
-        name: 'value',
-        type: 'uint256',
-      },
-    ],
-    name: 'Transfer',
-    type: 'event',
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: false,
-        internalType: 'address',
-        name: 'account',
-        type: 'address',
-      },
-    ],
-    name: 'Unfrozen',
-    type: 'event',
-  },
-  {
-    inputs: [],
-    name: 'DOMAIN_SEPARATOR',
-    outputs: [{ internalType: 'bytes32', name: '', type: 'bytes32' }],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'acceptOwnership',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    inputs: [
-      { internalType: 'address', name: 'owner', type: 'address' },
-      { internalType: 'address', name: 'spender', type: 'address' },
-    ],
-    name: 'allowance',
-    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [
-      { internalType: 'address', name: 'spender', type: 'address' },
-      { internalType: 'uint256', name: 'amount', type: 'uint256' },
-    ],
-    name: 'approve',
-    outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    inputs: [{ internalType: 'address', name: 'account', type: 'address' }],
-    name: 'balanceOf',
-    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [{ internalType: 'uint256', name: 'amount', type: 'uint256' }],
-    name: 'burn',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    inputs: [
-      { internalType: 'address', name: 'sender', type: 'address' },
-      { internalType: 'uint256', name: 'amount', type: 'uint256' },
-    ],
-    name: 'burnFrom',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'decimals',
-    outputs: [{ internalType: 'uint8', name: '', type: 'uint8' }],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [
-      { internalType: 'address', name: 'spender', type: 'address' },
-      { internalType: 'uint256', name: 'subtractedValue', type: 'uint256' },
-    ],
-    name: 'decreaseAllowance',
-    outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    inputs: [{ internalType: 'uint256', name: 'value', type: 'uint256' }],
-    name: 'estimateFee',
-    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'freeze',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'frozen',
-    outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [
-      { internalType: 'address', name: 'spender', type: 'address' },
-      { internalType: 'uint256', name: 'addedValue', type: 'uint256' },
-    ],
-    name: 'increaseAllowance',
-    outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'issuer',
-    outputs: [{ internalType: 'address', name: '', type: 'address' }],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'minFee',
-    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [
-      { internalType: 'address', name: 'account', type: 'address' },
-      { internalType: 'uint256', name: 'amount', type: 'uint256' },
-    ],
-    name: 'mint',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'name',
-    outputs: [{ internalType: 'string', name: '', type: 'string' }],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [{ internalType: 'address', name: 'owner', type: 'address' }],
-    name: 'nonces',
-    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'owner',
-    outputs: [{ internalType: 'address', name: '', type: 'address' }],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [
-      { internalType: 'address', name: 'owner', type: 'address' },
-      { internalType: 'address', name: 'spender', type: 'address' },
-      { internalType: 'uint256', name: 'value', type: 'uint256' },
-      { internalType: 'uint256', name: 'deadline', type: 'uint256' },
-      { internalType: 'uint8', name: 'v', type: 'uint8' },
-      { internalType: 'bytes32', name: 'r', type: 'bytes32' },
-      { internalType: 'bytes32', name: 's', type: 'bytes32' },
-    ],
-    name: 'permit',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    inputs: [
-      { internalType: 'uint256', name: 'numerator', type: 'uint256' },
-      { internalType: 'uint256', name: 'denominator', type: 'uint256' },
-      { internalType: 'uint256', name: 'fee', type: 'uint256' },
-    ],
-    name: 'setFee',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'symbol',
-    outputs: [{ internalType: 'string', name: '', type: 'string' }],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'totalSupply',
-    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [
-      { internalType: 'address', name: 'recipient', type: 'address' },
-      { internalType: 'uint256', name: 'amount', type: 'uint256' },
-    ],
-    name: 'transfer',
-    outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    inputs: [
-      { internalType: 'address', name: 'sender', type: 'address' },
-      { internalType: 'address', name: 'recipient', type: 'address' },
-      { internalType: 'uint256', name: 'amount', type: 'uint256' },
-    ],
-    name: 'transferFrom',
-    outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    inputs: [{ internalType: 'address', name: 'newOwner', type: 'address' }],
-    name: 'transferOwnership',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'unfreeze',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    inputs: [
-      { internalType: 'address', name: 'token_', type: 'address' },
-      { internalType: 'address', name: 'destination_', type: 'address' },
-      { internalType: 'uint256', name: 'amount_', type: 'uint256' },
-    ],
-    name: 'withdraw',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-];
-const testToken = '0xB786D9c8120D311b948cF1e5Aa48D8fBacf477E2';
+export const dataHandled = createContext([{}]);
+// const chain = 'https://rpc.tomochain.com';
+const chain = 'https://rpc.viction.xyz';
+const web3 = new Web3(chain);
+
+const testToken = '0x66e62620d83D9d5eeDD099B3E3589BDdb5820400';
 
 const conTract = (tokenAddress: any) =>
   new web3.eth.Contract(ABIVRC25, tokenAddress);
 
+const conTractBaryon = new web3.eth.Contract(ABIBaryon, testToken);
 interface StakeFarmProps {
   isFarm?: boolean;
 }
-
-// const data = [
-//   {
-//     img: 'https://raw.githubusercontent.com/BuildOnViction/tokens/master/tokens/0xb786d9c8120d311b948cf1e5aa48d8fbacf477e2.png',
-//     name: 'SAROS',
-//     symbol: 'SAROS',
-//     earn: 'SAROS',
-//     earnPerDay: '222,222.22',
-//     contractAddress: '0xB786D9c8120D311b948cF1e5Aa48D8fBacf477E2',
-//     poolLink:
-//       'https://www.baryon.network/stake?chain=tomo&poolAddress=0xB786D9c8120D311b948cF1e5Aa48D8fBacf477E2&completed=false',
-//     tokenLink:
-//       'https://www.vicscan.xyz/address/0xB786D9c8120D311b948cF1e5Aa48D8fBacf477E2',
-//     contractLink:
-//       'https://www.vicscan.xyz/tx/0x0110025dafe2981bef41d7d0ef495501dd6fe7a8a30969e604d79698c47312ad',
-//     apr: 95.45,
-//     finish: '28/10/2024 16:00',
-//     value: '99.9218',
-//     Liquidity: 156679.13,
-//     price: 0.00001,
-//     type: 'active',
-//   },
-//   {
-//     img: 'https://raw.githubusercontent.com/BuildOnViction/tokens/master/tokens/0xcdde1f5d971a369eb952192f9a5c367f33a0a891.png',
-//     name: 'SVIC',
-//     symbol: 'SVIC',
-//     earn: 'VIC',
-//     earnPerDay: '666,67',
-//     contractAddress: '0xCdde1f5D971A369eB952192F9a5C367f33a0A891',
-//     linkStaked:
-//       'https://www.baryon.network/stake?chain=tomo&poolAddress=0xCdde1f5D971A369eB952192F9a5C367f33a0A891&completed=false',
-//     tokenLink:
-//       'https://www.vicscan.xyz/tx/0x0110025dafe2981bef41d7d0ef495501dd6fe7a8a30969e604d79698c47312ad',
-//     contractLink:
-//       'https://www.vicscan.xyz/tx/0x1827f8408b1f57aeb7ddac3294f533e1002b52cb436feb4e82ad4626ea0d37a1',
-//     apr: 9.7,
-//     finish: '28/10/2024 16:00',
-//     value: '99.98928',
-//     Liquidity: 156679.13,
-//     price: 0.3,
-//     staked: 3000.93123,
-//     type: 'active',
-//   },
-// ];
 
 export default function StakeFarm({ isFarm }: StakeFarmProps) {
   const t = useTranslations();
   const { baryonApiService } = useBaryonServices();
   const { activeChain } = useGlobalStore();
   const { localCoins } = useGlobalStore();
+  // const { address, disconnect, connected } = useWallet();
 
   //data
   const [dataStake, setDataStake] = useState([{}]);
+  const [address, setAddress] = useState('');
   const [dataHandle, setDataHandle] = useState([{}]);
+  const [data, setData] = useState([{}]);
+  // const [dataPid, setDataPid] = useState({});
+  // const [userAddress, setUserAddress] = useState('');
 
   // sort
   const [liquidityClicked, setLiquidityClicked] = useState(true);
@@ -463,8 +86,27 @@ export default function StakeFarm({ isFarm }: StakeFarmProps) {
       })
       .then((response: any) => {
         setDataStake(response.data);
+        console.log(response.data);
       });
   };
+
+  const walletAccount = async () => {
+    // console.log('log provider', window.ethereum);
+    // const account = await window.coin98.provider.request({
+    //   method: 'eth_accounts',
+    // });
+    const account = await window.ethereum.request({
+      method: 'eth_requestAccounts',
+    });
+    // console.log('log account', account[0]);
+    setAddress(account[0]);
+  };
+
+  // const getDataFromChild = (data: any) => {
+  //   // console.log({ data });
+
+  //   setData(data);
+  // };
 
   const Tokens = values(localCoins)
     .flat()
@@ -477,18 +119,33 @@ export default function StakeFarm({ isFarm }: StakeFarmProps) {
   const callInfoOnchain = async (tokenAddress?: string) => {
     const callMethods = conTract(tokenAddress).methods;
     try {
+      // console.log(tokenAddress);
+      // console.log(address);
+      // console.log('start call onchain');
       const [name, symbol, decimals] = [
         await callMethods.name().call(),
         await callMethods.symbol().call(),
         await callMethods.decimals().call(),
       ];
+      // console.log({ name, symbol, decimals });
+      const balance = await callMethods.balanceOf(address).call();
+
+      const liquidity = await callMethods.balanceOf(testToken).call();
+      const allowance = await callMethods.allowance(address, testToken).call();
+      // console.log(address);
+      // console.log(liquidity);
+      // console.log(allowance);
       const data = {
         address: tokenAddress || '',
         name: name || '',
         symbol: symbol || '',
         decimals: decimals || 18,
+        balance: balance || '',
+        userAddress: address || '',
+        liquidity: liquidity || '',
+        allowance: allowance || '',
       };
-      console.log('data onchain', data);
+      // console.log('data onchain', data);
       return data;
     } catch (error) {
       console.log(error);
@@ -501,20 +158,55 @@ export default function StakeFarm({ isFarm }: StakeFarmProps) {
         dataStake.map(async (stake: any) => {
           const addressStake = stake.stakedLpAddress;
           const addressReward = stake.rewardTokens;
+          const timeStamp = stake.rewardsExpiration * 1000;
+          const date = new Date(timeStamp);
+          const [day, month, years, hours, minutes] = [
+            date.getDate().toString().padStart(2, '0'),
+            (date.getMonth() + 1).toString().padStart(2, '0'),
+            date.getFullYear().toString(),
+            date.getHours().toString().padStart(2, '0'),
+            date.getMinutes().toString().padStart(2, '0'),
+          ];
+          // console.log({ timeStamp });
+          const dateExpiration = `${day}/${month}/${years} ${hours}:${minutes}`;
+          // const rewardPerSec;
+          // console.log('data reward array', addressReward);
+          // console.log('data stake array', addressStake);
+          // console.log({ dateExpiration });
           const stakedLpAddressData =
             coinFinder(addressStake) || (await callInfoOnchain(addressStake));
-          // console.log('data reward array', addressReward);
           const rewardTokensData = addressReward
             ? await Promise.all(
                 addressReward.map(async (token: any) => {
+                  // console.log('address token', token);
                   return coinFinder(token) || (await callInfoOnchain(token));
                 }),
               )
             : [];
-          console.log('reward data', rewardTokensData);
+          // console.log('reward data', rewardTokensData);
+
+          const poolInfo = await dataByPid(stake.pid);
+          const stakeCoefficient = poolInfo.rewardPerSeconds;
+          console.log(stake.pid, { poolInfo });
+          // console.log(stake.pid, { stakeCoefficient });
+
+          const rewardPerSec = stake.rewardMultipliers;
+          const totalYearReward = rewardPerSec * 32536000;
+          const staked = await getUserInfo(stake.pid, address);
+          // console.log('🚀 ~ dataStake.map ~ staked:', staked);
+          const pendingReward = await getPendingReward(stake.pid, address);
+
           return {
             rewardTokens: rewardTokensData,
             stakedLpAddress: stakedLpAddressData,
+            // stakedDecimals: stakedLpAddressData.decimals,
+            pid: stake.pid,
+            staked: staked,
+            pendingReward: pendingReward,
+            dateExpiration: dateExpiration,
+            contractAddress: testToken,
+            totalYearReward: totalYearReward,
+            stakeCoefficient: stakeCoefficient,
           };
         }),
       );
@@ -526,8 +218,9 @@ export default function StakeFarm({ isFarm }: StakeFarmProps) {
     }
   };
 
+  const dataHandler = useDataHandle(dataHandle);
   const statusTabs = [
-    { label: t('Active'), count: dataHandle.length },
+    { label: t('Active'), count: isFarm ? 0 : dataHandle.length },
     { label: t('Completed'), count: 0 },
   ];
   const { params, setParams } = useFilterParams<{
@@ -541,84 +234,99 @@ export default function StakeFarm({ isFarm }: StakeFarmProps) {
 
   useEffect(() => {
     fecthDataStake();
-  }, [JSON.stringify(dataStake)]);
+  }, [JSON.stringify(dataStake), address]);
+
+  useEffect(() => {
+    walletAccount();
+  }, []);
 
   return (
-    <div className="container mx-auto py-8 px-0 ">
-      <div className="mb-6">
-        {isFarm ? <StakeFarmHead isFarm /> : <StakeFarmHead />}
-      </div>
-      <div className="mb-6">
-        <BoxSecondary
-          className="flex justify-between text-center items-center px-5 py-0
+    <dataHandled.Provider value={dataHandler}>
+      <div className="container mx-auto py-8 px-0 ">
+        <div className="mb-6">
+          {isFarm ? <StakeFarmHead isFarm /> : <StakeFarmHead />}
+        </div>
+        <div className="mb-6">
+          <BoxSecondary
+            className="flex justify-between text-center items-center px-5 py-0
         "
-        >
-          <div className="flex justify-center gap-2 items-center">
-            {statusTabs.map((it, idx) => {
-              const isActive = params.status === it?.label;
-              return (
-                <TabButton
-                  key={idx}
-                  onClick={() => setParams({ status: it?.label })}
-                  variant="line"
-                  isSelected={isActive}
-                  className="gap-1 flex-center px-0 font-light py-8 mr-3 "
-                >
-                  <span>{it.label}</span>{' '}
-                  {it?.count != undefined && (
-                    <span
-                      className={twMerge(
-                        'text-txt-secondary',
-                        isActive && 'text-txt-primary',
-                      )}
-                    >
-                      ({it?.count})
-                    </span>
-                  )}
-                </TabButton>
-              );
-            })}
-            <div className=" flex items-center">
-              <div>
-                <Switch className="text-txt-secondary" label={t('Staked')} />
+          >
+            <div className="flex justify-center gap-2 items-center">
+              {statusTabs.map((it, idx) => {
+                const isActive = params.status === it?.label;
+                return (
+                  <TabButton
+                    key={idx}
+                    onClick={() => setParams({ status: it?.label })}
+                    variant="line"
+                    isSelected={isActive}
+                    className="gap-1 flex-center px-0 font-light py-8 mr-3 "
+                  >
+                    <span>{it.label}</span>{' '}
+                    {it?.count != undefined && (
+                      <span
+                        className={twMerge(
+                          'text-txt-secondary',
+                          isActive && 'text-txt-primary',
+                        )}
+                      >
+                        ({it?.count})
+                      </span>
+                    )}
+                  </TabButton>
+                );
+              })}
+              <div className=" flex items-center">
+                <div>
+                  <Switch className="text-txt-secondary" label={t('Staked')} />
+                </div>
               </div>
             </div>
-          </div>
-          <div className="flex justify-around items-center">
-            <div className="flex items-center  gap-1">
-              <div>Sort: </div>
-              <div onClick={clickedBtnLiQuidity}>
-                <SelectedSort
-                  isSelected={liquidityClicked}
-                  name={'liquidity'}
-                  isUp={liquidityUp}
-                />
+            <div className="flex justify-around items-center">
+              <div className="flex items-center  gap-1">
+                <div>Sort: </div>
+                <div onClick={clickedBtnLiQuidity}>
+                  <SelectedSort
+                    isSelected={liquidityClicked}
+                    name={'liquidity'}
+                    isUp={liquidityUp}
+                  />
+                </div>
+                <div>|</div>
+                <div onClick={clickedBtnAPR}>
+                  <SelectedSort
+                    isSelected={aprClicked}
+                    isUp={aprUp}
+                    name={'APR'}
+                  />
+                </div>
               </div>
-              <div>|</div>
-              <div onClick={clickedBtnAPR}>
-                <SelectedSort
-                  isSelected={aprClicked}
-                  isUp={aprUp}
-                  name={'APR'}
-                />
+              <div className="flex items-center">
+                <div>
+                  <Input placeholder="Search here" isSearch />
+                </div>
+                <div>
+                  <Tooltip
+                    id="topTokens"
+                    trigger={t('common_data_auto_refresh')}
+                  >
+                    <PieLoading size={20} duration={DURATION.PIE_LOADING} />
+                  </Tooltip>
+                </div>
               </div>
             </div>
-            <div className="flex items-center">
-              <div>
-                <Input placeholder="Search here" isSearch />
-              </div>
-              <div>
-                <Tooltip id="topTokens" trigger={t('common_data_auto_refresh')}>
-                  <PieLoading size={20} duration={DURATION.PIE_LOADING} />
-                </Tooltip>
-              </div>
+          </BoxSecondary>
+        </div>
+        <div>
+          {isFarm ? (
+            <div className=" flex justify-center">
+              <Image width={300} height={300} src={IMAGE.empty} alt="" />
             </div>
-          </div>
-        </BoxSecondary>
+          ) : (
+            <StakeFarmContent />
+          )}
+        </div>
       </div>
-      <div>
-        <StakeFarmContent data={dataHandle} />
-      </div>
-    </div>
+    </dataHandled.Provider>
   );
 }

@@ -4,7 +4,7 @@ import Link from 'next/link';
 import ShareIcon from '@/components/ui/ShareIcon';
 
 export default function StakeFarmCardHead({ data }: any) {
-  console.log(data);
+  // console.log(data);
   return (
     <div className="text-center relative px-2">
       <div className="h-20">

@@ -41,6 +41,12 @@ importers:
       '@types/react-virtualized':
         specifier: ^9.21.30
         version: 9.21.30
+      bigdecimal:
+        specifier: ^0.6.1
+        version: 0.6.1
+      bignumber.js:
+        specifier: 9.1.2
+        version: 9.1.2
       lodash:
         specifier: ^4.17.21
         version: 4.17.21
@@ -1755,6 +1761,11 @@ packages:
   bech32@1.1.4:
     resolution: {integrity: sha512-s0IrSOzLlbvX7yp4WBfPITzpAU8sqQcpsmwXDiKwrG4r491vwCO/XpejasRNl0piBMe/DvP4Tz0mIS/X1DPJBQ==}
 
+  bigdecimal@0.6.1:
+    resolution: {integrity: sha512-pFxbEwaZRK6XifePcw22DxJkCzCMw3YAossM884Tkvh9QpdWzFBLkgdnjx29yEickWBVYv1F9DdaDxDaF3dzkw==}
+    engines: {'0': node}
+    hasBin: true
+
   bigint-buffer@1.1.5:
     resolution: {integrity: sha512-trfYco6AoZ+rKhKnxA0hgX0HAbVP/s808/EuDSe2JDzUnCp/xAsli35Orvk67UrTEcwuxZqYZDmfA2RXJgxVvA==}
     engines: {node: '>= 10.0.0'}
@@ -2093,8 +2104,9 @@ packages:
   crossws@0.3.1:
     resolution: {integrity: sha512-HsZgeVYaG+b5zA+9PbIPGq4+J/CJynJuearykPsXx4V/eMhyQ5EDVg3Ak2FBZtVXCiOLu/U7IiwDHTr9MA+IKw==}
 
-  crypto-browserify@3.12.0:
-    resolution: {integrity: sha512-fz4spIh+znjO2VjL+IdhEpRJ3YN6sMzITSBijk6FK2UvTqruSQW+/cCZTSNsMiZNvUeq0CqurF+dAbyiGOY6Wg==}
+  crypto-browserify@3.12.1:
+    resolution: {integrity: sha512-r4ESw/IlusD17lgQi1O20Fa3qNnsckR126TdUuBgAu7GBYSIPvdNyONd3Zrxh0xCwA4+6w/TDArBPsMvhur+KQ==}
+    engines: {node: '>= 0.10'}
 
   crypto-js@4.2.0:
     resolution: {integrity: sha512-KALDyEYgpY+Rlob/iriUtjV6d5Eq+Y191A5g4UqLAi8CyGP9N1+FdVbkc1SxKc2r4YAYqG8JzO2KGL+AizD70Q==}
@@ -5043,7 +5055,7 @@ snapshots:
       '@cosmjs/encoding': 0.30.1
       '@cosmjs/stargate': 0.30.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       cosmjs-types: 0.9.0
-      crypto: crypto-browserify@3.12.0
+      crypto: crypto-browserify@3.12.1
       stream: stream-browserify@3.0.0
     transitivePeerDependencies:
       - '@azure/app-configuration'
@@ -7610,6 +7622,8 @@ snapshots:
 
   bech32@1.1.4: {}
 
+  bigdecimal@0.6.1: {}
+
   bigint-buffer@1.1.5:
     dependencies:
       bindings: 1.5.0
@@ -8007,7 +8021,7 @@ snapshots:
     dependencies:
       uncrypto: 0.1.3
 
-  crypto-browserify@3.12.0:
+  crypto-browserify@3.12.1:
     dependencies:
       browserify-cipher: 1.0.1
       browserify-sign: 4.2.3
@@ -8015,6 +8029,7 @@ snapshots:
       create-hash: 1.2.0
       create-hmac: 1.1.7
       diffie-hellman: 5.0.3
+      hash-base: 3.0.4
       inherits: 2.0.4
       pbkdf2: 3.1.2
       public-encrypt: 4.0.3

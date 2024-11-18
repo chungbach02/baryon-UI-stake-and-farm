@@ -1,5 +1,7 @@
+import { MODAL } from '@/public';
 import { Button } from '@ne/uikit-dex';
 import { useTranslations } from 'next-intl';
+import Image from 'next/image';
 import React from 'react';
 
 const ModalApproval = ({
@@ -17,7 +19,10 @@ const ModalApproval = ({
 
   return (
     <div>
-      <div className="text-center text-base ipad:text-sm">
+      <div className=" items-center text-center text-base ipad:text-sm">
+        <div className="w-full flex justify-center mb-3">
+          <Image width={80} height={80} src={MODAL.confirm} alt="" />
+        </div>
         <div className="block w-max">
           {`${t('modal_you_are_approve_baryon')} ${token?.toUpperCase()} ${t('common_token').toLowerCase()}.`}
         </div>

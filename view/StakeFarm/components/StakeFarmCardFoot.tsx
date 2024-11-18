@@ -1,6 +1,12 @@
 import CurrencyValue from '@/components/common/CurrencyValue';
 import BoxSecondary from '@/components/ui/BoxSecondary';
+import ModalApproval from '@/components/ui/Modal/ModalApproval';
 import ModalConfirm from '@/components/ui/Modal/ModalConfirm';
+import {
+  approveBaryon,
+  convertBalanceToWei,
+  harvestReward,
+} from '@/view/StakeFarm/StakeFarm';
 import ModalHarvest from '@/view/StakeFarm/components/ModalHarvest';
 import ModalStaked from '@/view/StakeFarm/components/ModalStaked';
 
@@ -8,22 +14,27 @@ import { Button, Icon, Modal, SliderBrand } from '@ne/uikit-dex';
 import { set } from 'lodash';
 import React, { useState } from 'react';
 
-const dataStaker = {
-  address: '',
-  timeStake: '',
-  unClaimed: 99.0,
-  totalClaim: '',
-  valueStake: '',
-};
+// const dataStaker = {
+//   address: '',
+//   timeStake: '',
+//   unClaimed: 99.0,
+//   totalClaim: '',
+//   valueStake: '',
+// };
 
 export default function StakeFarmCardFoot({ data }: any) {
   const [modalToggle, setModalToggle] = useState(false);
   const [addStaked, setAddStaked] = useState(false);
   const [subStaked, setSubStaked] = useState(false);
+  const [approve, setApprove] = useState(false);
   const [modalMoreStake, setModalMoreStaked] = useState(false);
   const [modalUnStake, setModalUnStaked] = useState(false);
   const harvestClicked = () => {
     setModalToggle(!modalToggle);
+  };
+  const conFirmHarvest = () => {
+    harvestReward(data.pid, data.userAddress);
+    harvestClicked();
   };
   const addClicked = () => {
     setAddStaked(!addStaked);
@@ -39,13 +50,31 @@ export default function StakeFarmCardFoot({ data }: any) {
     setModalUnStaked(!modalUnStake);
     subStaked ? setSubStaked(!subStaked) : setSubStaked(subStaked);
   };
+
+  const unApprove = () => {
+    approveBaryon(0, data.userAddress, data.stakeAddress);
+  };
+  const approveClicked = () => {
+    setApprove(!approve);
+  };
+  const approveConfirm = () => {
+    const amount = convertBalanceToWei(99 * 10 ** 18, data.stakedDecimals);
+    approveBaryon(amount, data.userAddress, data.stakeAddress);
+    approve ? setApprove(!approve) : setApprove(approve);
+  };
+  const isEnable = data.allowance === 0 && data.staked === 0;
+  // console.log({ isEnable });
   return (
     <div className="py-6 px-4">
       <div className="flex justify-between relative">
         <div>
           <div className="text-txt-secondary mb-5">Unclaimed Rewards</div>
           <div className="text-txt-primary text-2xl mb-1">
-            <CurrencyValue value={data.value} />
+            {data.price === 0 ? (
+              <span>{data.pendingReward.toFixed(2)}</span>
+            ) : (
+              <CurrencyValue value={data.pendingReward * data.price} />
+            )}
           </div>
         </div>
         <Button
@@ -61,13 +90,19 @@ export default function StakeFarmCardFoot({ data }: any) {
           <span> Staked</span>
         </div>
         <div>
-          {data.staked ? (
+          {isEnable ? (
+            <div>
+              <Button onClick={approveClicked} className="w-full text-base">
+                Enable
+              </Button>
+            </div>
+          ) : data.staked ? (
             <div>
               <div className=" flex justify-between text-base items-center">
                 <div>
                   <div className="">{data.staked}</div>
                   <div className="font-thin text-sm">
-                    <CurrencyValue value={data.staked * data.price} />
+                    <CurrencyValue value={data.staked * data.price || 0} />
                   </div>
                 </div>
                 <div className="flex">
@@ -93,13 +128,18 @@ export default function StakeFarmCardFoot({ data }: any) {
               </Button>
             </div>
           )}
+          <div>
+            <Button onClick={unApprove} className=" w-full text-base mt-5">
+              Un Approve
+            </Button>
+          </div>
         </div>
       </div>
       <Modal
         children={
           <ModalHarvest
             onCancel={harvestClicked}
-            onConfirm={harvestClicked}
+            onConfirm={conFirmHarvest}
             data={data}
           ></ModalHarvest>
         }
@@ -129,6 +169,9 @@ export default function StakeFarmCardFoot({ data }: any) {
           isStakeMore={false}
           data={data}
         />
+      </Modal>
+      <Modal open={approve} onSetOpen={setApprove} size="lg">
+        <ModalApproval onCancel={approveClicked} onConfirm={approveConfirm} />
       </Modal>
     </div>
   );

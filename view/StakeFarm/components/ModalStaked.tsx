@@ -2,6 +2,14 @@ import BoxSecondary from '@/components/ui/BoxSecondary';
 import ButtonBack from '@/components/ui/ButtonBack';
 import { Button, SliderBrand } from '@ne/uikit-dex';
 import React, { useState } from 'react';
+import BigNumber from 'bignumber.js';
+import {
+  approveBaryon,
+  convertBalanceToWei,
+  DepositOnBaryon,
+  withdrawHarvest,
+} from '@/view/StakeFarm/StakeFarm';
+import { pid } from 'process';
 
 export default function ModalStaked({
   isStakeMore,
@@ -19,7 +27,38 @@ export default function ModalStaked({
 
   const handleChangeSLide = (value: any) => {
     setPercentValue(value);
-    setAmount(Math.floor(data.staked * value) / 100);
+    value ? setAmount(Math.floor(parseFloat(data.balance) * value) / 100) : 0;
+    console.log(Math.floor(parseFloat(data.balance) * value));
+  };
+
+  const stakeDecimals = Number(data.stakeDecimals);
+  const allowance = data.allowance;
+  const amountContract = new BigNumber(
+    convertBalanceToWei(amount, stakeDecimals).toString(),
+  );
+  // console.log('🚀 ~ clickStaked ~ amountContract:', amountContract);
+  const amountValue = BigInt(amountContract.integerValue().toFixed());
+  // console.log('🚀 ~ clickStaked ~ ', amountValue);
+  const amountHandled = Number(amountValue);
+  // console.log('address', data.userAddress);
+  const clickStaked = () => {
+    // console.log({ amount });
+    // console.log('🚀 ~ allowance:', allowance);
+    // console.log('🚀 ~ stakeDecimals:', stakeDecimals);
+
+    // console.log('window', window.ethereum);
+
+    if (amount < parseFloat(allowance)) {
+      DepositOnBaryon(data.pid, amountHandled, data.userAddress);
+      onConfirm;
+    } else {
+      alert('need Approve more to stake');
+      approveBaryon(amountHandled, data.userAddress, data.stakeAddress);
+    }
+  };
+  const clickUnStaked = () => {
+    withdrawHarvest(data.pid, amountHandled, data.userAddress);
+    onConfirm;
   };
 
   return (
@@ -59,7 +98,7 @@ export default function ModalStaked({
         </Button>
         {isStakeMore ? (
           percentValue > 0 ? (
-            <Button onClick={onConfirm} size="lg" className="w-2/5">
+            <Button onClick={clickStaked} size="lg" className="w-2/5">
               Stake Tokens
             </Button>
           ) : (
@@ -68,7 +107,7 @@ export default function ModalStaked({
             </Button>
           )
         ) : percentValue > 0 ? (
-          <Button onClick={onConfirm} size="lg" className="w-2/5">
+          <Button onClick={clickUnStaked} size="lg" className="w-2/5">
             UnStake Tokens
           </Button>
         ) : (
